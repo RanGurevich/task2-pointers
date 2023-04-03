@@ -18,6 +18,10 @@ typedef struct monom {
 } Monom;
 
 Monom* getPolynom(unsigned int* size);
+void printPolynom(Monom* polyNom, int size);
+void mergeSort(Monom* arr, int size, int flagPosition);
+void merge(Monom* arr1, int sizeArr1, Monom* arr2, int sizeArr2, Monom* resArr, int flagPosition);
+void copyArr(Monom dest[], Monom src[], int size);
 
 void main() {
 	Monom* polynom1, * polynom2;             // The input polynoms
@@ -40,68 +44,71 @@ void main() {
 	//free(polynom1); // releasing all memory allocations
 	//free(polynom2);
 }
-//int getPolyonomSize(char* inputString) {
-//	int count = 0;
-//	char steps[] = SYSTEM_SPACE;
-//	char *inputToWorkOn = strtok(inputString, steps);
-//	while (inputToWorkOn)
-//	{
-//		count++;
-//		inputToWorkOn = strtok(inputToWorkOn, NULL);
-//	}
-//	return (count / NUM_OF_OBJECT_MONOM);
-//
-//}
-//Monom* getPolynom(unsigned int* size) {
-//	Monom* polynom;
-//	char inputString[MAX_STRING_SIZE];
-//	char *token;
-//	int i;
-//	int maxPolynomSize = 1;
-//	char* specs = " \t\n";
-//	bool inputFinished = false;
-//	*size = 0;
-//	polynom = (Monom*)malloc(sizeof(Monom) * maxPolynomSize);
-//	if (!polynom) {
-//		printf("MEMORY ERROR");
-//	}
-//	gets(inputString);
-//	printf("%s", inputString);
-//	token = strtok(inputString, specs);
-//	while (token)
-//	{
-//		sscanf(token, "%d", &((polynom + *size)->coefficient));
-//		printf("** %d **", ((polynom + *size)->coefficient));
-//		token = strtok(NULL, specs);
-//		printf("%s", inputString);
-//		sscanf(token, "%d", &((polynom + *size)->power));
-//		*size++;
-//		if (*size == maxPolynomSize) {
-//		maxPolynomSize *= 2;
-//		polynom = realloc(polynom, maxPolynomSize * sizeof(Monom));
-//		if (!polynom) {
-//			printf("MEMORY ERROR");
-//			}
-//		}
-//		token = strtok(NULL, SYSTEM_SPACE);
-//	}
-//	//while (!inputFinished)
-//	//{
-//	//	if (*size == maxPolynomSize) {
-//	//		maxPolynomSize *= 2;
-//	//		polynom = realloc(polynom, maxPolynomSize * sizeof(Monom));
-//	//	}
-//	//	(*size)++;  // increment size before the scanf calls
-//	//	scanf("%d", &((polynom + *size - 1)->coefficient));
-//	//	scanf("%d", &((polynom + *size - 1)->power));
-//	//	if (getchar() == END_INPUT_STRING) {
-//	//		inputFinished = true;
-//	//	}
-//	//}
-//
-//	return polynom;
-//}
 
+void mergeSort(Monom* arr, int size, int flagPosition)
+{
+    // the function implement merge sort, with option to smaller number
+    // to bigger number and from bigger number to smaller using the flag position
+    Monom* tmpArr = NULL;
+    if (size <= 1)
+        return;
+
+    mergeSort(arr, size / 2, flagPosition);
+    mergeSort(arr + size / 2, size - size / 2, flagPosition);
+
+    tmpArr = (Monom*)malloc(size * sizeof(Monom));
+    if (tmpArr)
+    {
+        merge(arr, size / 2, arr + size / 2, size - size / 2, tmpArr, flagPosition);
+        copyArr(arr, tmpArr, size); // copy values from tmpArr to arr
+        free(tmpArr);
+    }
+    else
+    {
+        printf("Memory allocation failure!!!\n");
+        exit(1);	// end program immediately with code 1 (indicating an error)
+    }
+}
+
+void merge(Monom* arr1, int sizeArr1, Monom* arr2, int sizeArr2, Monom* resArr, int flagPosition)
+{
+    // the function merge 2 arrays, if the flag position is positive the merge will be from the smaller number to bigger
+    int indexArr1, indexArr2, indexArrRes;
+    indexArr1 = indexArr2 = indexArrRes = 0;
+
+    while ((indexArr1 < sizeArr1) && (indexArr2 < sizeArr2)) {
+        if (flagPosition ? arr1[indexArr1].power <= arr2[indexArr2].power : arr1[indexArr1].power >= arr2[indexArr2].power) {
+            resArr[indexArrRes] = arr1[indexArr1];
+            indexArr1++;
+        }
+        else {
+            resArr[indexArrRes] = arr2[indexArr2];
+            indexArr2++;
+        }
+        indexArrRes++;
+    }
+
+    while (indexArr1 < sizeArr1) {
+        resArr[indexArrRes] = arr1[indexArr1];
+        indexArr1++;
+        indexArrRes++;
+    }
+    while (indexArr2 < sizeArr2) {
+        resArr[indexArrRes] = arr2[indexArr2];
+        indexArr2++;
+        indexArrRes++;
+    }
+}
+
+
+void copyArr(Monom dest[], Monom src[], int size)
+{
+    // the function get array from dest and copy it to the src
+    int i;
+
+    for (i = 0; i < size; i++)
+        dest[i] = src[i];
+}
 
 
 Monom* getPolynom(unsigned int* size) {
@@ -109,6 +116,7 @@ Monom* getPolynom(unsigned int* size) {
     char inputString[MAX_STRING_SIZE];
     char* token;
     int i;
+    int powerInput, coefficentInput;
     int maxPolynomSize = 1;
     char* specs = " \t\n";
     bool inputFinished = false;
@@ -121,19 +129,38 @@ Monom* getPolynom(unsigned int* size) {
     token = strtok(inputString, specs);
     while (token)
     {
-        sscanf(token, "%d", &((polynom + *size)->coefficient));
+        sscanf(token, "%d", &coefficentInput);
+       // sscanf(token, "%d", &((polynom + *size)->coefficient));
         token = strtok(NULL, specs);
-        sscanf(token, "%d", &((polynom + *size)->power));
-        *size += 1;
-        if (*size == maxPolynomSize) {
-            maxPolynomSize *= 2;
-            polynom = realloc(polynom, maxPolynomSize * sizeof(Monom));
-            if (!polynom) {
-                printf("MEMORY ERROR");
+        sscanf(token, "%d", &powerInput);
+       // sscanf(token, "%d", &((polynom + *size)->power));
+        if (powerInput != 0 && coefficentInput != 0) {
+            (polynom + *size)->coefficient = coefficentInput;
+            (polynom + *size)->power = powerInput;
+            *size += 1;
+            if (*size == maxPolynomSize) {
+                maxPolynomSize *= 2;
+                polynom = realloc(polynom, maxPolynomSize * sizeof(Monom));
+                if (!polynom) {
+                    printf("MEMORY ERROR");
+                }
             }
         }
+
         token = strtok(NULL, specs);
     }
-
+    mergeSort(polynom, *size, 0);
+    printPolynom(polynom, *size);
     return polynom;
+}
+
+void printPolynom(Monom* polyNom, int size) {
+    int i;
+    for ( i = 0; i < size; i++)
+    {
+        printf("%dX^%d", polyNom[i].coefficient, polyNom[i].power);
+        if (i != size - 1 && polyNom[i + 1].coefficient > 0) {
+            printf("%c", '+');
+        }
+    }
 }
