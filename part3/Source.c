@@ -16,6 +16,7 @@ unsigned int RemoveFromStrArray(char*** str_array, unsigned  int  str_array_size
 int removePointerFromStringArray(char** stringArray, unsigned int stringArraySize, char* pointToRemove);
 void searchInStringAndRemove(char* string, char* pointerToRemove);
 void printArray(char** arr, unsigned int size);
+void freeArray(char** arr, int size);
 
 char** setPtrToCharsArray(char** str_array)
 {
@@ -56,10 +57,16 @@ int main()
 
     res = RemoveFromStrArray(&str_array, str_array_size, ptr_to_chars_array);
     printArray(str_array, str_array_size - res);
-    //
-    //	// Free memory
-    //	freeArray(str_array, str_array_size - res);
+   	// Free memory
+   	freeArray(str_array, str_array_size - res);
     free(ptr_to_chars_array);
+}
+void freeArray(char** arr, int size) {
+    int i;
+    for ( i = 0; i < size; i++)
+    {
+        free(arr[i]);
+    }
 }
 void printArray(char** arr, unsigned int size) {
     int i;
@@ -98,7 +105,6 @@ int removePointerFromStringArray(char** stringArray, unsigned int stringArraySiz
             {
                 stringArray[j] = stringArray[j + 1];
             }
-           // free(stringArray+j);
         }
     }
     return itemRemoved;
