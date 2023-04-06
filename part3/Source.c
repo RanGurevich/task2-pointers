@@ -19,24 +19,24 @@ void printArray(char** arr, unsigned int size);
 
 char** setPtrToCharsArray(char** str_array)
 {
-	char** res;
-	int size, i;
-	int str_array_row, str_array_col;
+    char** res;
+    int size, i;
+    int str_array_row, str_array_col;
 
-	scanf("%d", &size); // Get number of ptrs
-	res = (char**)malloc(sizeof(char*) * (size + 1)); // Add 1 for NULL at the end
+    scanf("%d", &size); // Get number of ptrs
+    res = (char**)malloc(sizeof(char*) * (size + 1)); // Add 1 for NULL at the end
 
-	if (res == NULL) {
-		exit(1);
-	}
-	for (i = 0; i < size; i++)
-	{
-		scanf("%d", &str_array_row);
-		scanf("%d", &str_array_col);
-		res[i] = str_array[str_array_row] + str_array_col;
-	}
-	res[size] = NULL; // Set the last one to NULL
-	return res;
+    if (res == NULL) {
+        exit(1);
+    }
+    for (i = 0; i < size; i++)
+    {
+        scanf("%d", &str_array_row);
+        scanf("%d", &str_array_col);
+        res[i] = str_array[str_array_row] + str_array_col;
+    }
+    res[size] = NULL; // Set the last one to NULL
+    return res;
 }
 
 
@@ -44,26 +44,26 @@ char** setPtrToCharsArray(char** str_array)
 int main()
 
 {
-	char** str_array;
-	unsigned int str_array_size;
-	char** ptr_to_chars_array;
-	unsigned int res;
+    char** str_array;
+    unsigned int str_array_size;
+    char** ptr_to_chars_array;
+    unsigned int res;
 
 
-	str_array = getStrArrayInput(&str_array_size); // Get the size and strings from user (can't assume max size for each string)
-	ptr_to_chars_array = setPtrToCharsArray(str_array);
+    str_array = getStrArrayInput(&str_array_size); // Get the size and strings from user (can't assume max size for each string)
+    ptr_to_chars_array = setPtrToCharsArray(str_array);
 
 
-	res = RemoveFromStrArray(&str_array, str_array_size, ptr_to_chars_array);
-	printArray(str_array, str_array_size - res);
-//
-//	// Free memory
-//	freeArray(str_array, str_array_size - res);
-	free(ptr_to_chars_array);
+    res = RemoveFromStrArray(&str_array, str_array_size, ptr_to_chars_array);
+    printArray(str_array, str_array_size - res);
+    //
+    //	// Free memory
+    //	freeArray(str_array, str_array_size - res);
+    free(ptr_to_chars_array);
 }
 void printArray(char** arr, unsigned int size) {
     int i;
-    for ( i = 0; i < size; i++)
+    for (i = 0; i < size; i++)
     {
         printf("%s\n", arr[i]);
     }
@@ -73,41 +73,47 @@ unsigned int RemoveFromStrArray(char*** str_array, unsigned  int  str_array_size
     int i;
     int sizeOfPointerArray = getSizeOfPointerArray(ptr_to_chars_array);
     mergeSort(ptr_to_chars_array, sizeOfPointerArray, FLAG_TO_DEC_SORT);
-    for ( i = 0; i < sizeOfPointerArray; i++)
+    for (i = 0; i < sizeOfPointerArray; i++)
     {
         countRemoved += removePointerFromStringArray(*str_array, str_array_size, *(ptr_to_chars_array + i));
     }
     return countRemoved;
 }
 
-int removePointerFromStringArray(char** stringArray, unsigned int stringArraySize, char *pointToRemove) {
+int removePointerFromStringArray(char** stringArray, unsigned int stringArraySize, char* pointToRemove) {
     int i, j;
-    int countRemoved = 0;
-    for ( i = 0; i < stringArraySize; i++)
+    int itemRemoved = 0;
+
+    for (i = 0; i < stringArraySize; i++)
     {
-         searchInStringAndRemove(stringArray[i], pointToRemove);
-        if (strcmp(stringArray[i], "\0") == 0) {
-            countRemoved++;
-                for ( j = i; j < stringArraySize-1; j++)
-                {
-                    stringArray[j] = stringArray[j + 1];
-                }
-          //      free(stringArray[j + 1]);
+        if (strlen(stringArray[i]) == 0) {
+            // in case the string came already empty and just need to be removed, we will decrease the counter and then in the for loop the
+            // the change will be return to 0
+            itemRemoved--;
+        }
+        searchInStringAndRemove(stringArray[i], pointToRemove);
+        if (strlen(stringArray[i]) == 0) {
+            itemRemoved++;
+            for (j = i; j < stringArraySize - 1; j++)
+            {
+                stringArray[j] = stringArray[j + 1];
+            }
+           // free(stringArray+j);
         }
     }
-    return countRemoved;
+    return itemRemoved;
 }
 
 void searchInStringAndRemove(char* string, char* pointerToRemove) {
     int i = 0;
     int j;
     int stringSize = strlen(string);
-    for ( i = 0; i < stringSize; i++)
+    for (i = 0; i < stringSize; i++)
     {
         if ((string + i) == pointerToRemove) {
-            for ( j = i; j < stringSize - 1; j++)
+            for (j = i; j < stringSize - 1; j++)
             {
-                string[j] = string[j +1];
+                string[j] = string[j + 1];
             }
             string[j] = '\0';
         }
@@ -182,7 +188,7 @@ void copyArr(char** dest, char** src, int size)
 int getSizeOfPointerArray(char** arr) {
     int index = 0;
     int count = 0;
-    while (*(arr + index)!= NULL)
+    while (*(arr + index) != NULL)
     {
         index++;
     }
