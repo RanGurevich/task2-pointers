@@ -11,10 +11,10 @@ char** setPtrToCharsArray(char** str_array);
 int getSizeOfPointerArray(char** arr);
 void mergeSort(char** arr, int size, int flagPosition);
 void merge(char** arr1, int sizeArr1, char** arr2, int sizeArr2, char** resArr, int flagPosition);
-void copyArr(char** dest[], char** src[], int size);
+void copyArr(char** dest, char** src, int size);
 unsigned int RemoveFromStrArray(char*** str_array, unsigned  int  str_array_size, char** ptr_to_chars_array);
 int removePointerFromStringArray(char** stringArray, unsigned int stringArraySize, char* pointToRemove);
-int searchInStringAndRemove(char* string, char* pointerToRemove);
+void searchInStringAndRemove(char* string, char* pointerToRemove);
 void printArray(char** arr, unsigned int size);
 
 char** setPtrToCharsArray(char** str_array)
@@ -77,7 +77,7 @@ unsigned int RemoveFromStrArray(char*** str_array, unsigned  int  str_array_size
     {
         countRemoved += removePointerFromStringArray(*str_array, str_array_size, *(ptr_to_chars_array + i));
     }
-    return 0;
+    return countRemoved;
 }
 
 int removePointerFromStringArray(char** stringArray, unsigned int stringArraySize, char *pointToRemove) {
@@ -85,16 +85,23 @@ int removePointerFromStringArray(char** stringArray, unsigned int stringArraySiz
     int countRemoved = 0;
     for ( i = 0; i < stringArraySize; i++)
     {
-        countRemoved += searchInStringAndRemove(stringArray[i], pointToRemove);
+         searchInStringAndRemove(stringArray[i], pointToRemove);
+        if (strcmp(stringArray[i], "\0") == 0) {
+            countRemoved++;
+                for ( j = i; j < stringArraySize-1; j++)
+                {
+                    stringArray[j] = stringArray[j + 1];
+                }
+          //      free(stringArray[j + 1]);
+        }
     }
-    return 0;
+    return countRemoved;
 }
 
-int searchInStringAndRemove(char* string, char* pointerToRemove) {
+void searchInStringAndRemove(char* string, char* pointerToRemove) {
     int i = 0;
     int j;
     int stringSize = strlen(string);
-    int countRemoved = 0;
     for ( i = 0; i < stringSize; i++)
     {
         if ((string + i) == pointerToRemove) {
@@ -103,11 +110,8 @@ int searchInStringAndRemove(char* string, char* pointerToRemove) {
                 string[j] = string[j +1];
             }
             string[j] = '\0';
-            free(string[j + 1]);
-            countRemoved++;
         }
     }
-    return 0;
 }
 
 void mergeSort(char** arr, int size, int flagPosition)
@@ -166,7 +170,7 @@ void merge(char** arr1, int sizeArr1, char** arr2, int sizeArr2, char** resArr, 
 }
 
 
-void copyArr(char** dest[], char** src[], int size)
+void copyArr(char** dest, char** src, int size)
 {
     // the function get array from dest and copy it to the src
     int i;
